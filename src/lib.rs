@@ -12,6 +12,14 @@ impl Codec {
     pub fn parse_codecs(codecs: &str) -> impl Iterator<Item = Result<Codec, CodecError>> + '_ {
         codecs.split(',').map(|s| s.trim().parse())
     }
+
+    pub fn avc1(profile: u8, constraints: u8, level: u8) -> Self {
+        Codec::Avc1(Avc1 {
+            profile,
+            constraints,
+            level
+        })
+    }
 }
 impl FromStr for Codec {
     type Err = CodecError;
