@@ -54,8 +54,8 @@ impl fmt::Display for Codec {
 fn get_rest(text: &str) -> Result<&str, CodecError> {
     if text.is_empty() {
         Ok(text)
-    } else if text.starts_with('.') {
-        Ok(&text[1..])
+    } else if let Some(rest) = text.strip_prefix('.') {
+        Ok(rest)
     } else {
         Err(CodecError::ExpectedHierarchySeparator(text.to_string()))
     }
