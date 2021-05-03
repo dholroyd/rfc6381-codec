@@ -44,7 +44,7 @@ impl fmt::Display for Codec {
                 profile,
                 constraints,
                 level,
-            }) => write!(f, "avc1.{:02x}{:02x}{:02x}", profile, constraints, level),
+            }) => write!(f, "avc1.{:02X}{:02X}{:02X}", profile, constraints, level),
             Codec::Mp4a(mp4a) => write!(f, "mp4a.{}", mp4a),
             Codec::Unknown(val) => f.write_str(val),
         }
@@ -231,7 +231,7 @@ mod tests {
                 level: 0x1e
             }))
         );
-        roundtrip("avc1.4d401e");
+        roundtrip("avc1.4D401E");
     }
 
     #[test]
