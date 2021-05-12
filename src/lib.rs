@@ -98,10 +98,11 @@ impl FromStr for Codec {
     type Err = CodecError;
 
     fn from_str(codec: &str) -> Result<Codec, Self::Err> {
-        if codec.len() < 4 {
-            Ok(Codec::Unknown(codec.to_owned()))
-        } else {
-            let (fourcc, rest) = codec.split_at(4);
+        if let Some(pos) = codec.find('.') {
+            let (fourcc, rest) = codec.split_at(pos);
+            if fourcc.len() != 4 {
+                return Ok(Codec::Unknown(codec.to_string()));
+            }
             let fourcc = FourCC::from(fourcc.as_bytes());
             let sample_entry = SampleEntryCode::from(fourcc);
             match sample_entry {
@@ -109,6 +110,8 @@ impl FromStr for Codec {
                 SampleEntryCode::AVC1 => Ok(Codec::Avc1(get_rest(rest)?.parse()?)),
                 _ => Ok(Codec::Unknown(codec.to_owned())),
             }
+        } else {
+            Err(CodecError::ExpectedHierarchySeparator(codec.to_string()))
         }
     }
 }
@@ -342,5 +345,12 @@ mod tests {
     fn unknown_fourcc() {
         assert_matches!(Codec::from_str("badd.41"), Ok(Codec::Unknown(v)) if v == "badd.41");
         roundtrip("badd.41");
+    }
+
+    #[test]
+    fn invalid_unicode_boundary() {
+        // byte position 4 is in the middle of a unicode codepoint - if we naively split off the
+        // first 4 bytes this would panic.  We shouldn't panic, we should instead produce an Err.
+        assert!(Codec::from_str("cod👍ec").is_err())
     }
 }
