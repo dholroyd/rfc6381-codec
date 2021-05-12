@@ -3,6 +3,9 @@
 Rust library for parsing and generating _codec_ string values, as specified in
 [RFC 6381, section 3](https://tools.ietf.org/html/rfc6381#section-3).
 
+[![crates.io version](https://img.shields.io/crates/v/rfc6381-codec.svg)](https://crates.io/crates/rfc6381-codec)
+[![Documentation](https://docs.rs/rfc6381-codec/badge.svg)](https://docs.rs/rfc6381-codec)
+
 ## Supported RFC 6381 features
 
  - [x] `avc1`
