@@ -1,6 +1,6 @@
 [package]
 name = "rfc6381-codec"
-version = "0.1.0"
+version = "0.1.1-dev"
 authors = ["David Holroyd <dave@badgers-in-foil.co.uk>"]
 edition = "2018"
 description = "Parser and generator for codec-string values, as specified in RFC 6381, section 3"
