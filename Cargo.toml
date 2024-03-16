@@ -13,8 +13,7 @@ repository = "https://github.com/dholroyd/rfc6381-codec"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mp4ra-rust = "0.1.0"
-four-cc = "0.1.0"
+mp4ra-rust = "0.3.0"
 mpeg4-audio-const = "0.2.0"
 
 [dev-dependencies]

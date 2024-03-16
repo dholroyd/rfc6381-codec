@@ -67,7 +67,6 @@
 //!    structures that can optionally specify a charset for the data like `en-gb'UTF-8'%25%20xz` or `''%25%20xz` — this crate does not support values
 //!    using these structures.
 
-use four_cc::FourCC;
 use mp4ra_rust::{ObjectTypeIdentifier, SampleEntryCode};
 use mpeg4_audio_const::AudioObjectType;
 use std::convert::TryFrom;
@@ -103,7 +102,7 @@ impl FromStr for Codec {
             if fourcc.len() != 4 {
                 return Ok(Codec::Unknown(codec.to_string()));
             }
-            let fourcc = FourCC::from(fourcc.as_bytes());
+            let fourcc = mp4ra_rust::FourCC::from(fourcc.as_bytes());
             let sample_entry = SampleEntryCode::from(fourcc);
             match sample_entry {
                 SampleEntryCode::MP4A => Ok(Codec::Mp4a(get_rest(rest)?.parse()?)),
