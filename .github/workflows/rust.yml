@@ -16,6 +16,8 @@ jobs:
 
     - name: Install toolchain
       uses: dtolnay/rust-toolchain@1.76.0
+      with:
+        components: rustfmt
 
     - name: Check format
       run: cargo fmt --check
