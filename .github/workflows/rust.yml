@@ -1,0 +1,67 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install toolchain
+      uses: dtolnay/rust-toolchain@1.76.0
+
+    - name: Check format
+      run: cargo fmt --check
+
+    - name: Build
+      run: cargo build --verbose --all-targets
+
+    - name: Run tests
+      run: cargo test --verbose
+
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-22.04
+    container:
+      image: xd009642/tarpaulin:0.22.0-slim
+      options: --security-opt seccomp=unconfined
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@1.76.0
+
+      - name: Generate code coverage
+        run: |
+          cargo tarpaulin --engine llvm --verbose --timeout 120 --out Lcov -- --test-threads 1
+
+      - name: upload to Coveralls
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: './lcov.info'
+
+
+  clippy:
+    name: Lint 📎
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@1.76.0
+        with:
+          components: clippy
+
+      - name: Run clippy
+        uses: actions-rs-plus/clippy-check@v2.2.0
+        with:
+          args: --all-features
