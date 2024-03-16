@@ -244,7 +244,7 @@ impl FromStr for Mp4a {
         let oti = ObjectTypeIdentifier::from(oti);
         let aoti = i
             .next()
-            .map(|v| u8::from_str(v))
+            .map(u8::from_str)
             .transpose()
             .map_err(|e| CodecError::InvalidComponent(e.to_string()))?;
         match oti {
