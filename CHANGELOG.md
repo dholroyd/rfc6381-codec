@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 - 2024-03-17
+
 ### Changed
  - Updated to Rust 2021 Edition
 
