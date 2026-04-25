@@ -1,0 +1,75 @@
+name: Fuzz
+
+on:
+  schedule:
+    # 06:17 UTC on the 1st of each month
+    - cron: '17 6 1 * *'
+  workflow_dispatch:
+    inputs:
+      max_total_time:
+        description: 'Max fuzzing time in seconds'
+        required: false
+        default: '1200'
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install nightly toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
+        with:
+          toolchain: nightly
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked
+
+      - name: Restore corpus from previous run
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p fuzz/corpus/fuzz_target_1
+          last=$(gh run list \
+            --workflow=fuzz.yml \
+            --status=success \
+            --limit=1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+          if [ -n "$last" ]; then
+            echo "Downloading corpus from run $last"
+            gh run download "$last" \
+              --name fuzz-corpus-fuzz_target_1 \
+              --dir fuzz/corpus/fuzz_target_1 || true
+          else
+            echo "No previous successful run; starting from seeds only"
+          fi
+
+      - name: Run fuzz target
+        run: |
+          cargo +nightly fuzz run fuzz_target_1 \
+            fuzz/corpus/fuzz_target_1 \
+            fuzz/seeds/fuzz_target_1 \
+            -- -max_total_time=${{ github.event.inputs.max_total_time || '1200' }}
+
+      - name: Upload corpus
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-corpus-fuzz_target_1
+          path: fuzz/corpus/fuzz_target_1
+          retention-days: 60
+          if-no-files-found: ignore
+
+      - name: Upload crash artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crash-artifacts
+          path: fuzz/artifacts/
+          if-no-files-found: ignore
