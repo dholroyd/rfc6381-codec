@@ -362,4 +362,35 @@ mod tests {
         // it would land mid-codepoint.  We must Err rather than panic.
         assert!(Codec::from_str("avc1.4\u{029e}\u{0}1E").is_err())
     }
+
+    #[test]
+    fn avc1_factory_and_accessors() {
+        let codec = Codec::avc1(0x4d, 0x40, 0x1e);
+        assert_matches!(
+            &codec,
+            Codec::Avc1(a) if a.profile() == 0x4d && a.constraints() == 0x40 && a.level() == 0x1e
+        );
+        assert_eq!(codec.to_string(), "avc1.4D401E");
+    }
+
+    #[test]
+    fn fourcc_wrong_length() {
+        // the prefix before '.' is not 4 bytes, so the whole string is returned as Unknown
+        assert_matches!(Codec::from_str("ab.cd"), Ok(Codec::Unknown(v)) if v == "ab.cd");
+        assert_matches!(Codec::from_str("abcde.12"), Ok(Codec::Unknown(v)) if v == "abcde.12");
+    }
+
+    #[test]
+    fn no_hierarchy_separator() {
+        assert_matches!(
+            Codec::from_str("avc1"),
+            Err(CodecError::ExpectedHierarchySeparator(v)) if v == "avc1"
+        );
+    }
+
+    #[test]
+    fn mp4a_unknown_oti_with_aoti() {
+        // exercises the Mp4a::Unknown Display path where audio_object_type_indication is Some
+        roundtrip("mp4a.41.5");
+    }
 }
