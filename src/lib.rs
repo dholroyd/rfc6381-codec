@@ -69,7 +69,6 @@
 
 use mp4ra_rust::{ObjectTypeIdentifier, SampleEntryCode};
 use mpeg4_audio_const::AudioObjectType;
-use std::convert::TryFrom;
 use std::fmt;
 use std::str::FromStr;
 
