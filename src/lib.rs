@@ -75,7 +75,11 @@ use std::str::FromStr;
 #[derive(Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Codec {
-    Avc1(Avc1),
+    Avc1(Avc),
+    /// AVC with in-band parameter sets. Codec-string grammar is identical to
+    /// `avc1`; only the fourcc (and the implied parameter-set location in the
+    /// bitstream) differs. Defined in ISO/IEC 14496-15, not RFC 6381 itself.
+    Avc3(Avc),
     Mp4a(Mp4a),
     Unknown(String),
 }
@@ -85,7 +89,15 @@ impl Codec {
     }
 
     pub fn avc1(profile: u8, constraints: u8, level: u8) -> Self {
-        Codec::Avc1(Avc1 {
+        Codec::Avc1(Avc {
+            profile,
+            constraints,
+            level,
+        })
+    }
+
+    pub fn avc3(profile: u8, constraints: u8, level: u8) -> Self {
+        Codec::Avc3(Avc {
             profile,
             constraints,
             level,
@@ -106,6 +118,7 @@ impl FromStr for Codec {
             match sample_entry {
                 SampleEntryCode::MP4A => Ok(Codec::Mp4a(get_rest(rest)?.parse()?)),
                 SampleEntryCode::AVC1 => Ok(Codec::Avc1(get_rest(rest)?.parse()?)),
+                SampleEntryCode::AVC3 => Ok(Codec::Avc3(get_rest(rest)?.parse()?)),
                 _ => Ok(Codec::Unknown(codec.to_owned())),
             }
         } else {
@@ -116,11 +129,16 @@ impl FromStr for Codec {
 impl fmt::Display for Codec {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Codec::Avc1(Avc1 {
+            Codec::Avc1(Avc {
                 profile,
                 constraints,
                 level,
             }) => write!(f, "avc1.{:02X}{:02X}{:02X}", profile, constraints, level),
+            Codec::Avc3(Avc {
+                profile,
+                constraints,
+                level,
+            }) => write!(f, "avc3.{:02X}{:02X}{:02X}", profile, constraints, level),
             Codec::Mp4a(mp4a) => write!(f, "mp4a.{}", mp4a),
             Codec::Unknown(val) => f.write_str(val),
         }
@@ -147,13 +165,15 @@ pub enum CodecError {
     UnexpectedLength { expected: usize, got: String },
 }
 
+/// AVC profile/constraints/level triple (the `PPCCLL` grammar from RFC 6381
+/// §3.3). Shared between the `avc1` and `avc3` codec-string forms.
 #[derive(Debug, PartialEq, Eq)]
-pub struct Avc1 {
+pub struct Avc {
     profile: u8,
     constraints: u8,
     level: u8,
 }
-impl Avc1 {
+impl Avc {
     pub fn profile(&self) -> u8 {
         self.profile
     }
@@ -164,7 +184,7 @@ impl Avc1 {
         self.level
     }
 }
-impl FromStr for Avc1 {
+impl FromStr for Avc {
     type Err = CodecError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
@@ -187,13 +207,16 @@ impl FromStr for Avc1 {
         let level = u8::from_str_radix(&value[4..6], 16)
             .map_err(|_| CodecError::InvalidComponent(value.to_string()))?;
 
-        Ok(Avc1 {
+        Ok(Avc {
             profile,
             constraints,
             level,
         })
     }
 }
+
+#[doc(hidden)]
+pub type Avc1 = Avc;
 
 #[derive(Debug, PartialEq, Eq)]
 #[non_exhaustive]
@@ -315,7 +338,7 @@ mod tests {
         );
         assert_matches!(
             i.next().unwrap(),
-            Ok(Codec::Avc1(Avc1 {
+            Ok(Codec::Avc1(Avc {
                 profile: 0x4d,
                 constraints: 0x40,
                 level: 0x1e
@@ -327,7 +350,7 @@ mod tests {
     fn avc1() {
         assert_matches!(
             Codec::from_str("avc1.4d401e"),
-            Ok(Codec::Avc1(Avc1 {
+            Ok(Codec::Avc1(Avc {
                 profile: 0x4d,
                 constraints: 0x40,
                 level: 0x1e
@@ -370,6 +393,57 @@ mod tests {
             Codec::Avc1(a) if a.profile() == 0x4d && a.constraints() == 0x40 && a.level() == 0x1e
         );
         assert_eq!(codec.to_string(), "avc1.4D401E");
+    }
+
+    #[test]
+    fn avc3() {
+        assert_matches!(
+            Codec::from_str("avc3.4d401e"),
+            Ok(Codec::Avc3(Avc {
+                profile: 0x4d,
+                constraints: 0x40,
+                level: 0x1e
+            }))
+        );
+        roundtrip("avc3.4D401E");
+    }
+
+    // Verifies the doc-hidden `Avc1` type alias still resolves so that
+    // pre-rename downstream code keeps compiling.
+    #[test]
+    fn avc1_alias_still_works() {
+        #[allow(deprecated)]
+        let _: Avc1 = Avc {
+            profile: 0,
+            constraints: 0,
+            level: 0,
+        };
+    }
+
+    #[test]
+    fn avc3_factory_and_accessors() {
+        let codec = Codec::avc3(0x64, 0x00, 0x1f);
+        assert_matches!(
+            &codec,
+            Codec::Avc3(a) if a.profile() == 0x64 && a.constraints() == 0x00 && a.level() == 0x1f
+        );
+        assert_eq!(codec.to_string(), "avc3.64001F");
+    }
+
+    #[test]
+    fn avc3_bad_length() {
+        assert_matches!(
+            Codec::from_str("avc3.4114"),
+            Err(CodecError::UnexpectedLength { expected: 6, got: text }) if text == "4114"
+        );
+    }
+
+    #[test]
+    fn avc1_and_avc3_are_distinct() {
+        assert_ne!(
+            Codec::from_str("avc1.4D401E").unwrap(),
+            Codec::from_str("avc3.4D401E").unwrap()
+        );
     }
 
     #[test]

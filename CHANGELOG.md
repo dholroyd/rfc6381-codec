@@ -3,10 +3,14 @@
 ## Unreleased
 
 ### Added
- - `PartialEq` and `Eq` are now derived for `Codec`, `Avc1`, and `Mp4a`.
+ - `PartialEq` and `Eq` are now derived for `Codec`, `Avc`, and `Mp4a`.
+ - `Codec::Avc3` variant and `Codec::avc3()` constructor for the `avc3` fourcc, which shares the
+   `avc1` codec-string grammar (ISO/IEC 14496-15; signals in-band parameter sets).
 
 ### Changed
  - Updated to Rust 2024 Edition (requires Rust 1.85 or later).
+ - Renamed the `Avc1` struct to `Avc` (it carries the profile/constraints/level triple
+   shared by both the `avc1` and `avc3` codec-string forms).
 
 ### Fixed
  - Avoid panic parsing an `avc1.` codec string whose 6-byte payload contains a multi-byte UTF-8

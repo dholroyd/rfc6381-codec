@@ -10,6 +10,7 @@ Rust library for parsing and generating _codec_ string values, as specified in
 ## Supported RFC 6381 features
 
  - [x] `avc1`
+ - [x] `avc3` (shares the `avc1` codec-string grammar; defined in ISO/IEC 14496-15, not RFC 6381 itself)
  - [x] `mp4a` only object-type-identifier `0x40` (MPEG 4 Audio) supported
  - [ ] other four-character-code values not supported
  - [ ] generic syntax including 'charset' and 'percent-encoding' not supported
