@@ -2,7 +2,7 @@
 name = "rfc6381-codec"
 version = "0.2.0"
 authors = ["David Holroyd <dave@badgers-in-foil.co.uk>"]
-edition = "2021"
+edition = "2024"
 description = "Parser and generator for codec-string values, as specified in RFC 6381, section 3"
 categories = [ "multimedia::video", "parser-implementations" ]
 keywords = [ "RFC6381" ]

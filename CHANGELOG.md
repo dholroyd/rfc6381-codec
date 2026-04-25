@@ -5,6 +5,9 @@
 ### Added
  - `PartialEq` and `Eq` are now derived for `Codec`, `Avc1`, and `Mp4a`.
 
+### Changed
+ - Updated to Rust 2024 Edition (requires Rust 1.85 or later).
+
 ### Fixed
  - Avoid panic parsing an `avc1.` codec string whose 6-byte payload contains a multi-byte UTF-8
    character, which previously caused byte-indexing to land mid-codepoint.
