@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0 - 2026-04-25
+
 ### Added
  - `PartialEq` and `Eq` are now derived for `Codec`, `Avc`, and `Mp4a`.
  - `Codec::Avc3` variant and `Codec::avc3()` constructor for the `avc3` fourcc, which shares the

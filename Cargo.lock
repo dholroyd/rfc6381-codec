@@ -31,7 +31,7 @@ checksum = "3720a0d1569be60cd7b0ff00d31c8e1397f6928957a5d9ad0724592f3e78f24c"
 
 [[package]]
 name = "rfc6381-codec"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "assert_matches",
  "mp4ra-rust",
