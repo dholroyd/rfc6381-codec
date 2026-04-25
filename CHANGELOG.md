@@ -5,6 +5,10 @@
 ### Added
  - `PartialEq` and `Eq` are now derived for `Codec`, `Avc1`, and `Mp4a`.
 
+### Fixed
+ - Avoid panic parsing an `avc1.` codec string whose 6-byte payload contains a multi-byte UTF-8
+   character, which previously caused byte-indexing to land mid-codepoint.
+
 ## 0.2.0 - 2024-03-17
 
 ### Changed

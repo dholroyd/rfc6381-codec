@@ -175,6 +175,9 @@ impl FromStr for Avc1 {
                 got: value.to_string(),
             });
         }
+        if !value.is_ascii() {
+            return Err(CodecError::InvalidComponent(value.to_string()));
+        }
 
         let profile = u8::from_str_radix(&value[0..2], 16)
             .map_err(|_| CodecError::InvalidComponent(value.to_string()))?;
@@ -351,5 +354,12 @@ mod tests {
         // byte position 4 is in the middle of a unicode codepoint - if we naively split off the
         // first 4 bytes this would panic.  We shouldn't panic, we should instead produce an Err.
         assert!(Codec::from_str("cod👍ec").is_err())
+    }
+
+    #[test]
+    fn avc1_non_ascii_payload() {
+        // payload is 6 bytes but contains a 2-byte UTF-8 codepoint, so byte-indexing into
+        // it would land mid-codepoint.  We must Err rather than panic.
+        assert!(Codec::from_str("avc1.4\u{029e}\u{0}1E").is_err())
     }
 }
