@@ -25,9 +25,9 @@ dependencies = [
 
 [[package]]
 name = "mpeg4-audio-const"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96a1fe2275b68991faded2c80aa4a33dba398b77d276038b8f50701a22e55918"
+checksum = "3720a0d1569be60cd7b0ff00d31c8e1397f6928957a5d9ad0724592f3e78f24c"
 
 [[package]]
 name = "rfc6381-codec"

@@ -73,7 +73,7 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Codec {
     Avc1(Avc1),
@@ -148,7 +148,7 @@ pub enum CodecError {
     UnexpectedLength { expected: usize, got: String },
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Avc1 {
     profile: u8,
     constraints: u8,
@@ -193,7 +193,7 @@ impl FromStr for Avc1 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Mp4a {
     Mpeg4Audio {
