@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload corpus
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fuzz-corpus-fuzz_target_1
           path: fuzz/corpus/fuzz_target_1
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload crash artifacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fuzz-crash-artifacts
           path: fuzz/artifacts/
