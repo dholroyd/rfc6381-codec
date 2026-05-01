@@ -30,7 +30,7 @@ jobs:
         uses: cargo-bins/cargo-binstall@v1.18.1
 
       - name: Install cargo-fuzz
-        run: cargo binstall --no-confirm --locked --version 0.13.1 cargo-fuzz
+        run: cargo binstall --no-confirm --force --locked --version 0.13.1 cargo-fuzz
 
       - name: Restore corpus from previous run
         continue-on-error: true
