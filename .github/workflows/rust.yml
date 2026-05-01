@@ -60,6 +60,6 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
 
       - name: Run clippy
-        uses: actions-rs-plus/clippy-check@v2.4.2
+        uses: actions-rs-plus/clippy-check@v2.5.0
         with:
           args: --all-features
