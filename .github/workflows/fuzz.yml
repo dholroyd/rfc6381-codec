@@ -55,7 +55,9 @@ jobs:
 
       - name: Run fuzz target
         run: |
-          cargo +nightly fuzz run fuzz_target_1 \
+          cargo +nightly fuzz run \
+            --target x86_64-unknown-linux-gnu \
+            fuzz_target_1 \
             fuzz/corpus/fuzz_target_1 \
             fuzz/seeds/fuzz_target_1 \
             -- -max_total_time=${{ github.event.inputs.max_total_time || '1200' }}
