@@ -27,7 +27,7 @@ jobs:
           toolchain: nightly
 
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@v1.18.1
+        uses: cargo-bins/cargo-binstall@v1.20.1
 
       - name: Install cargo-fuzz
         run: cargo binstall --no-confirm --force --locked --version 0.13.1 cargo-fuzz
