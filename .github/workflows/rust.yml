@@ -44,7 +44,7 @@ jobs:
           cargo tarpaulin --engine llvm --verbose --timeout 120 --fail-under 85 --out Lcov -- --test-threads 1
 
       - name: upload to Coveralls
-        uses: coverallsapp/github-action@v2.3.7
+        uses: coverallsapp/github-action@v2.3.8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: './lcov.info'
